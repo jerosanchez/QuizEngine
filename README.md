@@ -1,3 +1,3 @@
 # QuizEngine
 
-A description of this package.
+The QuizApp engine.
