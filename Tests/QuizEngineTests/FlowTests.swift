@@ -101,21 +101,6 @@ final class FlowTests: XCTestCase {
     private func makeSUT(questions: [String], scoring: @escaping ([String: String]) -> Int = { _ in 0 }) -> Flow<String, String, RouterSpy> {
         return Flow(questions: questions, router: router, scoring: scoring)
     }
-    
-    class RouterSpy: Router {
-        var routedQuestions: [String] = []
-        var routedResult: QuizResult<String, String>? = nil
-        var answerCallback: (String) -> Void = { _  in }
-        
-        func routeTo(question: String, answerCallback: @escaping (String) -> Void) {
-            routedQuestions.append(question)
-            self.answerCallback = answerCallback
-        }
-        
-        func routeTo(result: QuizResult<String, String>) {
-            routedResult = result
-        }
-    }
 
     static var allTests = [
         ("test_start_withNoQuestion_doesNotRouteToQuestion", test_start_withNoQuestion_doesNotRouteToQuestion),
