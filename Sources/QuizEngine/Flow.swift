@@ -1,19 +1,21 @@
-
 import Foundation
 
 protocol Router {
-    typealias AnswerCallback = (String) -> Void
+    associatedtype Question: Hashable
+    associatedtype Answer
     
-    func routeTo(question: String, answerCallback: @escaping AnswerCallback)
-    func routeTo(result: [String: String])
+    typealias AnswerCallback = (Answer) -> Void
+    
+    func routeTo(question: Question, answerCallback: @escaping AnswerCallback)
+    func routeTo(result: [Question: Answer])
 }
 
-class Flow {
-    private let router: Router
-    private let questions: [String]
-    private var result: [String: String] = [:]
+class Flow <Question, Answer, R: Router> where R.Question == Question, R.Answer == Answer {
+    private let router: R
+    private let questions: [Question]
+    private var result: [Question: Answer] = [:]
     
-    init(questions: [String], router: Router) {
+    init(questions: [Question], router: R) {
         self.questions = questions
         self.router = router
     }
@@ -28,11 +30,11 @@ class Flow {
     
     // MARK: - Helpers
     
-    private func nextAnswerCallback(for question: String) -> Router.AnswerCallback {
+    private func nextAnswerCallback(for question: Question) -> R.AnswerCallback {
         return { [weak self] in self?.routeNext(question, $0) }
     }
     
-    private func routeNext(_ question: String, _ answer: String) {
+    private func routeNext(_ question: Question, _ answer: Answer) {
         if let currentQuestionIndex = questions.firstIndex(of: question) {
             result[question] = answer
             let nextQuestionIndex = currentQuestionIndex + 1
@@ -46,6 +48,5 @@ class Flow {
         } else {
             fatalError("Internal error: Trying to route to a non-existent question")
         }
-
     }
 }
